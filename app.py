@@ -210,6 +210,8 @@ import random
 import time
 from curl_cffi import requests
 import pydash
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -327,7 +329,7 @@ def extract_products(jsn):
 
 
         price = (pydash.get(data, "pricing_info.price.text")           # BEST
-            or pydash.get(data, "normal_price.text")              # fallback
+            or pydash.get(data, "normal_price.text")                   # fallback
             or pydash.get(data, "tracking.common_attributes.price"))
 
         mrp = (
@@ -365,19 +367,23 @@ def home():
 
 
 # 🔥 API Endpoint
-@app.route("/search", methods=["GET"])
+@app.route("/search")
 def search():
     keyword = request.args.get("q")
 
-    if not keyword:
-        return jsonify({"error": "Missing 'q' parameter"}), 400
+    print("\n🔥 SEARCH HIT:", keyword)
 
     jsn = fetch_search_page(keyword)
 
+    print("🔥 RAW RESPONSE:", jsn)
+
     if not jsn:
+        print("❌ fetch_search_page returned None")
         return jsonify({"error": "Failed to fetch data"}), 500
 
     products = extract_products(jsn)
+
+    print("🔥 PRODUCTS FOUND:", len(products))
 
     return jsonify({
         "keyword": keyword,
@@ -387,4 +393,4 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
