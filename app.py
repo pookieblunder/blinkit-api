@@ -243,7 +243,7 @@ cookies = {
 def get_headers():
     d = random.choice(DEVICES)
     return {
-            "accept": "application/json",
+            # "accept": "application/json",
             "content-type": "application/json",
             "app_client": "consumer_web",
             "app_version": "1010101011",
@@ -252,6 +252,10 @@ def get_headers():
             "lat": d["lat"],
             "lon": d["lon"],
 
+            # "origin": "https://blinkit.com",
+            # "referer": "https://blinkit.com/",
+            # "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120",
+            "accept": "*/*",
             "origin": "https://blinkit.com",
             "referer": "https://blinkit.com/",
 
@@ -291,40 +295,62 @@ def fetch_search_page(keyword, offset=0):
 def extract_products(jsn):
     results = []
 
+    if not jsn:
+        return results
+
     snippets = pydash.get(jsn, "response.snippets", [])
 
+    if not snippets:
+        print("No snippets → API structure changed")
+        return results
+
     for snip in snippets:
-        if snip.get("widget_type") not in [
-            "product_card_snippet_type_2",
-            "product_card_type_unbounded_v2",
-            "product_card_horizontal_snippet"
-        ]:
+
+        if snip.get("widget_type") not in ["product_card_snippet_type_2","product_card_type_unbounded_v2", "product_card_horizontal_snippet"]:
             continue
 
         data = snip.get("data", {})
 
+        # Product ID
         pid = data.get("product_id") or pydash.get(data, "identity.id")
         if not pid:
             continue
+
 
         name = (
             pydash.get(data, "display_name.text")
             or pydash.get(data, "name.text")
         )
 
-        price = (
-            pydash.get(data, "pricing_info.price.text")
-            or pydash.get(data, "normal_price.text")
+
+        price = (pydash.get(data, "pricing_info.price.text")           # BEST
+            or pydash.get(data, "normal_price.text")              # fallback
+            or pydash.get(data, "tracking.common_attributes.price"))
+
+        mrp = (
+            pydash.get(data, "pricing_info.mrp.text")             # BEST
+            or pydash.get(data, "mrp.text")                       # fallback
+            or pydash.get(data, "tracking.common_attributes.mrp")
         )
 
+
+        if isinstance(price, str):
+            price = price.replace("₹", "").strip()
+
+        if isinstance(mrp, str):
+            mrp = mrp.replace("₹", "").strip()
+
         results.append({
-            "pid": pid,
+            "pid": str(pid),
             "name": name,
             "price": price,
-            "product_url": f"https://blinkit.com/prn/x/prid/{pid}"
+            "mrp": mrp,
+            "product_url": f"https://blinkit.com/prn/x/prid/{pid}",
+            "status": "done" if price else "pending"
         })
 
     return results
+
 
 
 @app.route("/")
