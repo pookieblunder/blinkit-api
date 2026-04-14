@@ -327,6 +327,14 @@ def extract_products(jsn):
     return results
 
 
+@app.route("/")
+def home():
+    return jsonify({
+        "status": "ok",
+        "message": "Blinkit API is running"
+    })
+
+
 # 🔥 API Endpoint
 @app.route("/search", methods=["GET"])
 def search():
