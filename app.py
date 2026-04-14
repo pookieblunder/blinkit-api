@@ -224,23 +224,23 @@ DEVICES = [
     {"device_id": "99ac2211b9aa", "lat": "19.0760", "lon": "72.8777"},
 ]
 
-cookies = {
-    'gr_1_deviceId': 'e7ae8231-3b4a-4aba-8210-653c8856d771',
-    '_gcl_au': '1.1.1193079599.1767937879',
-    '_fbp': 'fb.1.1767937884119.190796487447140728',
-    'gr_1_lat': '17.3924982',
-    'gr_1_lon': '78.46796379999999',
-    'gr_1_locality': 'Hyderabad',
-    'gr_1_landmark': 'undefined',
-    '_gid': 'GA1.2.1438408380.1768193920',
-    '__cf_bm': 'u4bDNt.OxlxXIz4kiLgdjEyt.xC8nCxcs090pwjUJME-1768199094-1.0.1.1-hjBBKLUFl17QliOUkHO5P7cKBzCHPZmXlLCRa_C3mxnQ6u6lqZXhG369uUbJAkUjTjGvZQKqZ8rowxXF_da_QrgR7qAHsbMBK3xoyKeNYjs',
-    '__cfruid': '561e08e2000533dba8a8d677c11ed0884ad834b0-1768199094',
-    '_cfuvid': 'nn0cULB8lPTku9qMcDaRgccbLj1qurvTI5DSeb0uJcc-1768199094611-0.0.1.1-604800000',
-    '_ga_JSMJG966C7': 'GS2.1.s1768197718$o8$g1$t1768199094$j59$l0$h0',
-    '_ga': 'GA1.2.2074212143.1767937880',
-    '_gat_UA-85989319-1': '1',
-    '_ga_DDJ0134H6Z': 'GS2.2.s1768197718$o8$g1$t1768199094$j60$l0$h0',
-}
+# cookies = {
+#     'gr_1_deviceId': 'e7ae8231-3b4a-4aba-8210-653c8856d771',
+#     '_gcl_au': '1.1.1193079599.1767937879',
+#     '_fbp': 'fb.1.1767937884119.190796487447140728',
+#     'gr_1_lat': '17.3924982',
+#     'gr_1_lon': '78.46796379999999',
+#     'gr_1_locality': 'Hyderabad',
+#     'gr_1_landmark': 'undefined',
+#     '_gid': 'GA1.2.1438408380.1768193920',
+#     '__cf_bm': 'u4bDNt.OxlxXIz4kiLgdjEyt.xC8nCxcs090pwjUJME-1768199094-1.0.1.1-hjBBKLUFl17QliOUkHO5P7cKBzCHPZmXlLCRa_C3mxnQ6u6lqZXhG369uUbJAkUjTjGvZQKqZ8rowxXF_da_QrgR7qAHsbMBK3xoyKeNYjs',
+#     '__cfruid': '561e08e2000533dba8a8d677c11ed0884ad834b0-1768199094',
+#     '_cfuvid': 'nn0cULB8lPTku9qMcDaRgccbLj1qurvTI5DSeb0uJcc-1768199094611-0.0.1.1-604800000',
+#     '_ga_JSMJG966C7': 'GS2.1.s1768197718$o8$g1$t1768199094$j59$l0$h0',
+#     '_ga': 'GA1.2.2074212143.1767937880',
+#     '_gat_UA-85989319-1': '1',
+#     '_ga_DDJ0134H6Z': 'GS2.2.s1768197718$o8$g1$t1768199094$j60$l0$h0',
+# }
 
 def get_headers():
     d = random.choice(DEVICES)
@@ -262,7 +262,7 @@ def get_headers():
 
             "referer": "https://blinkit.com/",
 
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/143.0.0.0",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "x-age-consent-granted": "false",
         }
 
@@ -282,15 +282,18 @@ def fetch_search_page(keyword, offset=0):
             url,
             params=params,
             headers=get_headers(),
-            cookies=cookies
+            # cookies=cookies
         )
+
         print("STATUS:", response.status_code)
         print("TEXT:", response.text[:200])
 
         if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+            try:
+                return response.json()
+            except Exception:
+                print("NOT JSON RESPONSE:", response.text[:500])
+                return None
 
     except Exception as e:
         print("Error:", e)
