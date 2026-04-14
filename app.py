@@ -251,12 +251,13 @@ def get_headers():
             "device_id": d["device_id"],
             "lat": d["lat"],
             "lon": d["lon"],
+            "accept": "application/json",
+            "origin": "https://blinkit.com",
 
             # "origin": "https://blinkit.com",
             # "referer": "https://blinkit.com/",
             # "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120",
-            "accept": "*/*",
-            "origin": "https://blinkit.com",
+
             "referer": "https://blinkit.com/",
 
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/143.0.0.0",
@@ -281,6 +282,8 @@ def fetch_search_page(keyword, offset=0):
             headers=get_headers(),
             cookies=cookies
         )
+        print("STATUS:", response.status_code)
+        print("TEXT:", response.text[:200])
 
         if response.status_code == 200:
             return response.json()
