@@ -329,10 +329,10 @@ def extract_products(jsn):
 
 @app.route("/")
 def home():
-    return jsonify({
+    return {
         "status": "ok",
         "message": "Blinkit API is running"
-    })
+    }
 
 
 # 🔥 API Endpoint
